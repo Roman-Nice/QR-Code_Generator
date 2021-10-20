@@ -1,0 +1,133 @@
+﻿@inject IJSRuntime js;
+
+@using QRcodeGenerator.Data;
+
+
+
+<style>
+    .flex-container {
+        display: flex;
+        height: 1vw;
+        flex-direction: column;
+
+        position: absolute;
+        clear: both;
+    }
+
+    .flex-item {
+
+        margin-top: 0.5em;
+        width: 2vw;
+    }
+
+    .btn {
+        border-radius: 5px;
+        border: 2px solid gray;
+    }
+    .colorPicker {
+
+        background: @Color;
+    }
+
+    .qr-display{
+
+        width: @qrsize;
+        height: @qrsize;
+
+    }
+</style>
+
+
+<h3>QR code generator</h3>
+
+
+<div class="flex-container">
+    <div class="flex-item">
+        <label>
+            URL
+            <input type="text" @bind-value="Url" />
+        </label>
+    </div>
+
+    <div class="flex-item">
+        <label>
+            Size
+            <input type="text" @bind-value="qrsize" />
+        </label>
+    </div>
+
+    <div class="flex-item">
+        <button class="btn" @onclick="submit_Click">
+            Submit
+        </button>
+    </div>
+
+    @if (Image != null)
+    {
+        <div class="flex-item">
+            <button class="btn" @onclick="Save_Click">
+                Save
+            </button>
+        </div>
+
+        <div class="flex-item">
+            <img class="qr-display" src="data:image/png;base64,@Image" />
+        </div>
+     }
+
+</div>
+
+        @code
+{
+    public string Url { get; set; }
+        public string Encoding { get; set; }
+        public string Color { get; set; }
+
+
+        public string Image { get; set; }
+
+        public int RealSize { get; set; }
+
+        private string qr_size;
+        public string qrsize
+        {
+            get { return qr_size + "px"; }
+            set { string s = value.Replace("px", ""); qr_size = s; SetSize(s); }
+        }
+
+        private void SetSize(string value)
+        {
+            bool isNumber = int.TryParse(value, out int size);
+            if (isNumber)
+            {
+                RealSize = size;
+            }
+            else
+            {
+                RealSize = 250;
+                qrsize = "250";
+            }
+        }
+
+        protected override void OnInitialized()
+        {
+            SetSize("initial");
+
+            base.OnInitialized();
+        }
+
+        public async void submit_Click()
+        {
+            QRgeneratorService generator = new QRgeneratorService(Url, RealSize);
+
+            Image = generator.Generate();
+        }
+
+        public async void Save_Click()
+        {
+            await js.InvokeAsync<object>(
+                "saveAsFile",
+                "MyQrCode.png",
+                Image);
+        }
+        }
