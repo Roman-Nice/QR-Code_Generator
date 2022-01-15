@@ -1,3 +1,4 @@
+> In the Root folder run:
 @echo off <br/>
 echo "Checking node version" <br/>
 node -v <br/>
