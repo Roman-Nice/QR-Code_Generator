@@ -5,6 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:QRcodeDemo"
         mc:Ignorable="d"
+        Closing="DataWindow_Closing"
+        AllowDrop="True"
+        Drop="Window_Drop"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Grid.RowDefinitions>

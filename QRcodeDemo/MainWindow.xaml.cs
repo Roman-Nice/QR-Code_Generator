@@ -27,24 +27,65 @@ namespace QRcodeDemo
     /// </summary>
     public partial class MainWindow : Window
     {
+        public CrossPlatformFileService FileService { get; set; }
+
         public MainWindow()
         {
             InitializeComponent();
+            FileService = new CrossPlatformFileService();
+        }
+
+        private void DataWindow_Closing(object sender, CancelEventArgs e)
+        {
+            FileService.Close();
+        }
+
+        private async void Window_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = e.Data.GetData(DataFormats.FileDrop) as string[];
+
+                HandlePathInputed(files[0]);
+            }
         }
 
         public Bitmap RawBitmap { get; set; }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            Generate();
-            DisplayBitmap();
+            string inputUrl = fe_urlTB.Text;
+
+            HandlePathInputed(inputUrl);
+
+
             fe_save.Visibility = Visibility.Visible;
         }
 
-        private void Generate()
+        private async void HandlePathInputed(string path)
+        {
+            try
+            {
+                if (!path.Contains("https://") || !path.Contains("http://"))
+                {
+                    FileService.DeleteHostedFile();
+                    path = await FileService.HostFile(path);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+            Generate(path);
+            DisplayBitmap();
+
+            fe_urlTB.Text = path;
+        }
+
+        private void Generate(string url)
         {
             QRCodeEncoder encoder = new QRCodeEncoder();
-            string url = fe_urlTB.Text;
 
             Bitmap btmp = encoder.Encode(url, Encoding.UTF8);
             RawBitmap = btmp;
