@@ -18,6 +18,7 @@ using System.ComponentModel;
 using System.Windows.Interop;
 using System.IO;
 using System.Globalization;
+using Microsoft.Win32;
 
 namespace QRcodeDemo
 {
@@ -37,6 +38,7 @@ namespace QRcodeDemo
         {
             Generate();
             DisplayBitmap();
+            fe_save.Visibility = Visibility.Visible;
         }
 
         private void Generate()
@@ -80,6 +82,16 @@ namespace QRcodeDemo
 
             return Convert.ToBase64String(imageBytes);
 
+        }
+
+        private void fe_save_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog fileDialog = new SaveFileDialog();
+            fileDialog.Title = "Save file";
+            
+            fileDialog.ShowDialog();
+
+           // File.Create()
         }
     }
 }
