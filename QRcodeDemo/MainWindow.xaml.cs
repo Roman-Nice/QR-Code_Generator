@@ -27,12 +27,12 @@ namespace QRcodeDemo
     /// </summary>
     public partial class MainWindow : Window
     {
-        public CrossPlatformFileService FileService { get; set; }
+        public FTTCPService FileService { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
-            FileService = new CrossPlatformFileService();
+            FileService = new FTTCPService();
         }
 
         private void DataWindow_Closing(object sender, CancelEventArgs e)
@@ -100,7 +100,7 @@ namespace QRcodeDemo
             if (bmp == null)
                 return null;
 
-            using (Stream str = new MemoryStream())
+            using(Stream str = new MemoryStream())
             {
                 bmp.Save(str, System.Drawing.Imaging.ImageFormat.Bmp);
                 str.Seek(0, SeekOrigin.Begin);
@@ -116,13 +116,11 @@ namespace QRcodeDemo
 
         private string ConvertToBase64(Bitmap bitmap)
         {
-
             MemoryStream stream = new MemoryStream();
             bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
             byte[] imageBytes = stream.ToArray();
 
             return Convert.ToBase64String(imageBytes);
-
         }
 
         private void fe_save_Click(object sender, RoutedEventArgs e)
@@ -133,6 +131,17 @@ namespace QRcodeDemo
             fileDialog.ShowDialog();
 
            // File.Create()
+        }
+
+        private void fe_urlTB_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string inputUrl = fe_urlTB.Text;
+            Generate(inputUrl);
+        }
+
+        private void Window_Initialized(object sender, EventArgs e)
+        {
+            Generate("https://github.com/Roman-Nice");
         }
     }
 }
