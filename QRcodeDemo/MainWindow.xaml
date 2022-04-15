@@ -19,13 +19,36 @@
 
         </Grid.RowDefinitions>
         
-        <Image Grid.Row="0" Name="fe_Image"></Image>
+        <Image Grid.Row="0" Name="fe_Image" ></Image>
         
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Height="Auto" MaxHeight="50">
-            <TextBox Text="" VerticalContentAlignment="Center" MinWidth="200" MaxWidth="750" Name="fe_urlTB" TextChanged="fe_urlTB_TextChanged"></TextBox>
+            <TextBox Text="" VerticalContentAlignment="Center" MinWidth="200" MaxWidth="750" Name="fe_urlTB" TextChanged="fe_urlTB_TextChanged">
+                <TextBox.Style>
+                    <Style TargetType="TextBox" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                        <Style.Resources>
+                            <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                                <VisualBrush.Visual>
+                                    <Label Content="Paste url or text" Foreground="LightGray" />
+                                </VisualBrush.Visual>
+                            </VisualBrush>
+                        </Style.Resources>
+                        <Style.Triggers>
+                            <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                                <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                            </Trigger>
+                            <Trigger Property="Text" Value="{x:Null}">
+                                <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter Property="Background" Value="White" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
             <!--Button Content="Submit" Click="Button_Click" MinWidth="50"></-->
             <Button Name="fe_open" Content="Open" MinWidth="50" Visibility="Visible" Click="fe_open_Click"></Button>
-            <Button Name="fe_save" Content="Save"  Margin="10,0,0,0" MinWidth="50" Visibility="Visible" Click="fe_save_Click"></Button>
+            <Button Name="fe_save" Content="Copy"  Margin="10,0,0,0" MinWidth="50" Visibility="Visible" Click="fe_save_Click"></Button>
             <Button Name="fe_save_html" Content="Copy as HTML tag"  Margin="10,0,0,0" MinWidth="50" Visibility="Visible" Click="fe_copy_Click"></Button>
         </StackPanel>
 

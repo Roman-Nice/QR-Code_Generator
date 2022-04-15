@@ -33,6 +33,7 @@ namespace QRcodeDemo
 
         public MainWindow()
         {
+            this.DataContext = this;
             InitializeComponent();
             FileService = new FTHTTPService();
         }
@@ -48,7 +49,16 @@ namespace QRcodeDemo
             {
                 string[] files = e.Data.GetData(DataFormats.FileDrop) as string[];
 
-                HandlePathInputed(files[0]);
+                bool pathIsDirectory = Directory.Exists(files[0]);
+                if (files.Length == 1 && !pathIsDirectory)
+                {
+                    HandlePathInputed(files[0]);
+                    return;
+                }
+
+                if (pathIsDirectory)
+                    files = Directory.GetFiles(files[0], "*");
+                HandlePathsInputed(files);
             }
         }
 
@@ -64,15 +74,34 @@ namespace QRcodeDemo
             fe_save.Visibility = Visibility.Visible;
         }
 
-        private async void HandlePathInputed(string path)
+        private async Task HandlePathInputed(string path)
         {
+            FileService.DeleteHostedFile();
             try
             {
                 if (!path.Contains("https://") || !path.Contains("http://"))
                 {
-                    FileService.DeleteHostedFile();
                     path = await FileService.HostFile(path);
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+            Generate(path);
+            DisplayBitmap();
+
+            fe_urlTB.Text = path;
+        }
+
+        private async Task HandlePathsInputed(string[] files)
+        {
+            string path = "";
+            FileService.DeleteHostedFile();
+            try
+            {
+                path = await FileService.HostFolder(files);
             }
             catch (Exception ex)
             {
@@ -135,12 +164,8 @@ namespace QRcodeDemo
 
         private void fe_save_Click(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog fileDialog = new SaveFileDialog();
-            fileDialog.Title = "Save file";
-            
-            fileDialog.ShowDialog();
-
-           // File.Create()
+            Clipboard.SetText(fe_urlTB.Text);
+            WriteLine("Copied to clipboard!");
         }
 
         private void fe_urlTB_TextChanged(object sender, TextChangedEventArgs e)

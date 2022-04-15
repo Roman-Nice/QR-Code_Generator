@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -51,6 +52,29 @@ namespace QRcodeDemo
             Port = GetPortNumber(output);
             Url = $"http://{IpAdress}:{Port}/";
         }
+
+        internal async Task<string> HostFolder(string[] files)
+        {
+            string tmpDir = $"Server/_temp/{DateTime.Now.ToString("dd-hh-mm-ss-FFF")}";
+            tmpDir = Directory.CreateDirectory(tmpDir).FullName;
+
+            foreach (var file in files)
+            {
+                string tmpFile = Path.Combine(tmpDir)+ "\\" + Path.GetFileName(file);
+                File.Copy(file, tmpFile);
+
+            }
+
+            string zipPath = Path.Combine(Directory.GetParent(tmpDir).FullName)+ "\\" + DateTime.Now.ToString("dd-hh-mm-ss-FFF") + ".zip";
+            ZipFile.CreateFromDirectory(tmpDir, zipPath);
+            Task.Run(()=> Directory.Delete(tmpDir, true));
+            LocalFileName = zipPath;
+            HostedFileName = Url + "Server/_temp/" + Path.GetFileName(zipPath);
+            return HostedFileName;
+        }
+        
+    
+
         public StringBuilder Output { get; set; } = new StringBuilder();
 
         private string GetPortNumber(string processOutput)
