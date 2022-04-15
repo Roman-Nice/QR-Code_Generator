@@ -8,35 +8,40 @@
         Closing="DataWindow_Closing"
         AllowDrop="True"
         Drop="Window_Drop"
-        Title="MainWindow" Height="450" Width="800"
+        Title="QRCode Manager" Height="450" Width="800"
         Initialized="Window_Initialized"
         >
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1.5*"></RowDefinition>
             <RowDefinition Height="0.22*"></RowDefinition>
-            <RowDefinition></RowDefinition>
+            <RowDefinition MaxHeight="250"></RowDefinition>
 
         </Grid.RowDefinitions>
         
         <Image Grid.Row="0" Name="fe_Image"></Image>
         
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Height="Auto" MaxHeight="50">
-            <TextBox Text="" VerticalContentAlignment="Center" MinWidth="200" Name="fe_urlTB" TextChanged="fe_urlTB_TextChanged"></TextBox>
+            <TextBox Text="" VerticalContentAlignment="Center" MinWidth="200" MaxWidth="750" Name="fe_urlTB" TextChanged="fe_urlTB_TextChanged"></TextBox>
             <!--Button Content="Submit" Click="Button_Click" MinWidth="50"></-->
-            <Button Name="fe_open" Content="Open" MinWidth="50" Visibility="Visible" Click="fe_save_Click"></Button>
+            <Button Name="fe_open" Content="Open" MinWidth="50" Visibility="Visible" Click="fe_open_Click"></Button>
             <Button Name="fe_save" Content="Save"  Margin="10,0,0,0" MinWidth="50" Visibility="Visible" Click="fe_save_Click"></Button>
-            <Button Name="fe_save_html" Content="Copy as HTML tag"  Margin="10,0,0,0" MinWidth="50" Visibility="Visible" Click="fe_save_Click"></Button>
+            <Button Name="fe_save_html" Content="Copy as HTML tag"  Margin="10,0,0,0" MinWidth="50" Visibility="Visible" Click="fe_copy_Click"></Button>
         </StackPanel>
-        
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-            </Grid.ColumnDefinitions>
 
-            <TextBox Grid.Column="0" Name="fe_display1" VerticalScrollBarVisibility="Visible" IsReadOnly="True" TextWrapping="Wrap"></TextBox>
-            <TextBox Grid.Column="1" Name="fe_display2" VerticalScrollBarVisibility="Visible" IsReadOnly="True" TextWrapping="Wrap"></TextBox>
-        </Grid>
+
+
+
+        
+        <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                
+                
+                <TextBox Grid.Column="0" Name="fe_display1" Width="0" VerticalScrollBarVisibility="Visible" IsReadOnly="True" TextWrapping="Wrap"></TextBox>
+                <TextBox Grid.Column="0" Grid.ColumnSpan="2" Name="fe_display2" VerticalScrollBarVisibility="Visible" IsReadOnly="True" TextWrapping="Wrap" HorizontalScrollBarVisibility="Auto"></TextBox>
+            </Grid>
     </Grid>
 </Window>

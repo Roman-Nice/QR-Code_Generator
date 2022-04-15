@@ -10,14 +10,14 @@ using System.Windows;
 
 namespace QRcodeDemo
 {
-    public class FTTCPService
+    public class FTHTTPService
     {
         public string Url { get; set; }
         public string IpAdress { get; set; }
         public string Port { get; set; }
         private Process Server { get; set; }
 
-        public FTTCPService()
+        public FTHTTPService()
         {
             IpAdress = GetIp();
             StartServer();
@@ -35,8 +35,6 @@ namespace QRcodeDemo
             Server.StartInfo.UseShellExecute = false;
             Server.StartInfo.RedirectStandardOutput = true;
 
-            //Server.OutputDataReceived += CaptureOutput;
-
             Server.Start();
 
             while (!Server.StandardOutput.EndOfStream)
@@ -49,12 +47,9 @@ namespace QRcodeDemo
             }
 
             string output = Output.ToString();
+            LoggingExtension.WriteLine(output);
             Port = GetPortNumber(output);
             Url = $"http://{IpAdress}:{Port}/";
-
-            // ProcessOutputSynchronizationContext();
-
-            //return $"http://{IpAdress}:{Port}/";
         }
         public StringBuilder Output { get; set; } = new StringBuilder();
 
@@ -77,10 +72,9 @@ namespace QRcodeDemo
         private string HostedFileName { get; set; }
         public string LocalFileName { get; set; }
 
-        Random rnd = new Random();
         public async Task<string> HostFile(string originalUri)
         {
-            LocalFileName = $"Server/_temp/_{rnd.Next(10000, 99999)}.{GetFileExtension(originalUri)}";
+            LocalFileName = $"Server/_temp/_{DateTime.Now.ToString("dd-hh-mm-ss-FFF")}.{GetFileExtension(originalUri)}";
             File.Copy(originalUri, LocalFileName);
 
             int c = LocalFileName.Split("/").Length;
@@ -101,7 +95,7 @@ namespace QRcodeDemo
         {
             if(LocalFileName != null)
                 File.Delete(LocalFileName);
-            Server.CloseMainWindow();
+            LoggingExtension.WriteLine(Server.CloseMainWindow()); //efasefaefae
         }
 
         private string GetFileExtension(string uri)

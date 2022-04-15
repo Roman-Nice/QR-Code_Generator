@@ -19,6 +19,8 @@ using System.Windows.Interop;
 using System.IO;
 using System.Globalization;
 using Microsoft.Win32;
+using System.Diagnostics;
+using static QRcodeDemo.LoggingExtension;
 
 namespace QRcodeDemo
 {
@@ -27,12 +29,12 @@ namespace QRcodeDemo
     /// </summary>
     public partial class MainWindow : Window
     {
-        public FTTCPService FileService { get; set; }
+        public FTHTTPService FileService { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
-            FileService = new FTTCPService();
+            FileService = new FTHTTPService();
         }
 
         private void DataWindow_Closing(object sender, CancelEventArgs e)
@@ -87,9 +89,17 @@ namespace QRcodeDemo
         {
             QRCodeEncoder encoder = new QRCodeEncoder();
 
-            Bitmap btmp = encoder.Encode(url, Encoding.UTF8);
+            Bitmap btmp = null;
+            try
+            {
+                btmp = encoder.Encode(url, Encoding.UTF8);
+            }
+            catch (IndexOutOfRangeException ex)
+            {
+                Task.Run(delegate { MessageBox.Show("Link was too long"); });
+                fe_urlTB.Text = "👀";
+            }
             RawBitmap = btmp;
-
 
             fe_Image.Source = (ImageSource) ConvertToImageSource(btmp);
         }
@@ -142,6 +152,48 @@ namespace QRcodeDemo
         private void Window_Initialized(object sender, EventArgs e)
         {
             Generate("https://github.com/Roman-Nice");
+        }
+
+        private void fe_copy_Click(object sender, RoutedEventArgs e)
+        {
+            (string, string) crashInfo = ("undefined", "undefined");
+            try
+            {
+                string displayContent = fe_display1.Text;
+                string htmlTag = $"<img src=\"data: image / png; base64,{displayContent}\"/>";
+                crashInfo = (displayContent, htmlTag);
+                Clipboard.SetText(htmlTag);
+            }
+            catch( Exception ex) 
+            {
+                WriteLine("failed: " + ex.Message);
+                WriteLine("Target: ");
+
+                if(crashInfo.Item2 == "undefined")
+                    WriteLine(crashInfo.Item1);
+                else
+                    WriteLine(crashInfo.Item2);
+            }
+
+            WriteLine("Copied!");
+        }
+
+        private void fe_open_Click(object sender, RoutedEventArgs e)
+        {
+            LoggingExtension.WriteLine("opening: "+ fe_urlTB.Text);
+            try
+            {
+                var psi = new ProcessStartInfo()
+                {
+                    UseShellExecute = true,
+                    FileName = fe_urlTB.Text
+                };
+                Process.Start(psi);
+            }
+            catch(Exception ex)
+            {
+                LoggingExtension.WriteLine("failed: "+ex.Message);
+            }
         }
     }
 }
